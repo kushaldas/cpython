@@ -1235,6 +1235,45 @@ pymain_parse_cmdline(_PyMain *pymain, _PyCoreConfig *config,
     return 0;
 }
 
+static wchar_t *
+py_dirname(const wchar_t *filename)
+{
+    wchar_t *dir = _PyMem_RawWcsdup(filename);
+    if (dir == NULL) {
+        return NULL;
+    }
+    size_t i = wcslen(dir);
+
+    while (i > 0 && dir[i] != SEP)
+        --i;
+    dir[i] = '\0';
+
+    char *buffer[100];
+    PyOS_snprintf(buffer, sizeof(buffer), "/python%d.%d/lib", PY_MAJOR_VERSION, PY_MINOR_VERSION);
+    wchar_t *pybuffer = Py_DecodeLocale(buffer, NULL);
+    if (pybuffer == NULL) {
+        PyMem_RawFree(dir);
+        return NULL;
+    }
+    size_t buffer_len = wcslen(dir) + wcslen(pybuffer);
+
+    wchar_t *final_path = PyMem_RawMalloc(buffer_len * sizeof(wchar_t));
+    if (final_path == NULL) {
+        PyMem_RawFree(dir);
+        PyMem_RawFree(pybuffer);
+        return NULL;
+    }
+
+    wcscat(final_path, dir);
+    wcscat(final_path, pybuffer);
+
+    PyMem_RawFree(dir);
+    PyMem_RawFree(pybuffer);
+
+
+    return final_path;
+}
+
 
 /* Parse command line options and environment variables.
    This code must not use Python runtime apart PyMem_Raw memory allocator.
@@ -1255,6 +1294,14 @@ pymain_read_conf_impl(_PyMain *pymain, _PyCoreConfig *config,
 
     if (pymain_init_core_argv(pymain, config, cmdline) < 0) {
         return -1;
+    }
+
+    if (pymain->filename != NULL) {
+        config->pypackages_path = py_dirname(pymain->filename);
+        if (config->pypackages_path == NULL) {
+            pymain->err = _Py_INIT_NO_MEMORY();
+            return -1;
+        }
     }
 
     err = _PyCoreConfig_Read(config);

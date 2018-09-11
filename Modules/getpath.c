@@ -763,6 +763,10 @@ calculate_module_search_path(const _PyCoreConfig *core_config,
         bufsz += wcslen(core_config->module_search_path_env) + 1;
     }
 
+    if (core_config->pypackages_path != NULL) {
+        bufsz += wcslen(core_config->pypackages_path) + 1;
+    }
+
     wchar_t *defpath = calculate->pythonpath;
     size_t prefixsz = wcslen(prefix) + 1;
     while (1) {
@@ -798,6 +802,13 @@ calculate_module_search_path(const _PyCoreConfig *core_config,
         wcscpy(buf, core_config->module_search_path_env);
         wcscat(buf, delimiter);
     }
+
+    /* Add __pypackages__ directory */
+    if (core_config->pypackages_path) {
+        wcscpy(buf, core_config->pypackages_path);
+        wcscat(buf, delimiter);
+    }
+
 
     /* Next is the default zip path */
     wcscat(buf, calculate->zip_path);

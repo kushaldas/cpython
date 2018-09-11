@@ -224,6 +224,7 @@ _PyCoreConfig_Clear(_PyCoreConfig *config)
     CLEAR(config->pycache_prefix);
     CLEAR(config->module_search_path_env);
     CLEAR(config->home);
+    CLEAR(config->pypackages_path);
     CLEAR(config->program_name);
     CLEAR(config->program);
 
@@ -310,6 +311,7 @@ _PyCoreConfig_Copy(_PyCoreConfig *config, const _PyCoreConfig *config2)
     COPY_WSTR_ATTR(pycache_prefix);
     COPY_WSTR_ATTR(module_search_path_env);
     COPY_WSTR_ATTR(home);
+    COPY_WSTR_ATTR(pypackages_path);
     COPY_WSTR_ATTR(program_name);
     COPY_WSTR_ATTR(program);
 

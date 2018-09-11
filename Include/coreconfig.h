@@ -123,6 +123,8 @@ typedef struct {
     wchar_t *module_search_path_env; /* PYTHONPATH environment variable */
     wchar_t *home;          /* PYTHONHOME environment variable,
                                see also Py_SetPythonHome(). */
+    
+    wchar_t *pypackages_path; /* For __pypackages__ directory */
 
     /* Path configuration outputs */
     int nmodule_search_path;        /* Number of sys.path paths,
