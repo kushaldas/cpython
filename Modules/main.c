@@ -1244,18 +1244,23 @@ py_dirname(const wchar_t *filename)
     }
     size_t i = wcslen(dir);
 
+#ifdef ALTSEP
+    while (i > 0 && dir[i] != SEP && dir[i] != ALTSEP)
+        --i;
+#else
     while (i > 0 && dir[i] != SEP)
         --i;
+#endif
     dir[i] = '\0';
 
-    char *buffer[100];
-    PyOS_snprintf(buffer, sizeof(buffer), "/python%d.%d/lib", PY_MAJOR_VERSION, PY_MINOR_VERSION);
+    char buffer[100];
+    PyOS_snprintf(buffer, sizeof(buffer), "%c__pypackages__%cpython%d.%d%clib", SEP, SEP, PY_MAJOR_VERSION, PY_MINOR_VERSION, SEP);
     wchar_t *pybuffer = Py_DecodeLocale(buffer, NULL);
     if (pybuffer == NULL) {
         PyMem_RawFree(dir);
         return NULL;
     }
-    size_t buffer_len = wcslen(dir) + wcslen(pybuffer);
+    size_t buffer_len = wcslen(dir) + wcslen(pybuffer) + 1;
 
     wchar_t *final_path = PyMem_RawMalloc(buffer_len * sizeof(wchar_t));
     if (final_path == NULL) {
@@ -1264,7 +1269,7 @@ py_dirname(const wchar_t *filename)
         return NULL;
     }
 
-    wcscat(final_path, dir);
+    wcscpy(final_path, dir);
     wcscat(final_path, pybuffer);
 
     PyMem_RawFree(dir);
