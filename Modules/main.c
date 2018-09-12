@@ -1301,12 +1301,23 @@ pymain_read_conf_impl(_PyMain *pymain, _PyCoreConfig *config,
         return -1;
     }
 
+    /* In case of script files */
     if (pymain->filename != NULL) {
         config->pypackages_path = py_dirname(pymain->filename);
         if (config->pypackages_path == NULL) {
             pymain->err = _Py_INIT_NO_MEMORY();
             return -1;
         }
+    } else {
+        /* For the rest of the cases. */
+        char buffer[10];
+        PyOS_snprintf(buffer, sizeof(buffer), ".%c.", SEP);
+        config->pypackages_path = py_dirname(Py_DecodeLocale(buffer, NULL));
+        if (config->pypackages_path == NULL) {
+            pymain->err = _Py_INIT_NO_MEMORY();
+            return -1;
+        }
+
     }
 
     err = _PyCoreConfig_Read(config);

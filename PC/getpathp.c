@@ -796,6 +796,9 @@ calculate_module_search_path(const _PyCoreConfig *core_config,
     if (calculate->user_path) {
         bufsz += wcslen(calculate->user_path) + 1;
     }
+    if (core_config->pypackages_path) {
+        bufsz += wcslen(core_config->pypackages_path) + 1;
+    }
     if (calculate->machine_path) {
         bufsz += wcslen(calculate->machine_path) + 1;
     }
@@ -829,6 +832,16 @@ calculate_module_search_path(const _PyCoreConfig *core_config,
         buf = wcschr(buf, L'\0');
         *buf++ = DELIM;
     }
+    /* Adds the __pypackages__ directory */
+    if (core_config->pypackages_path) {
+        if (wcscpy_s(buf, bufsz - (buf - start_buf),
+                core_config->pypackages_path)) {
+                    return INIT_ERR_BUFFER_OVERFLOW();
+        }
+        buf = wcschr(buf, L'\0');
+        *buf++ = DELIM;
+    }
+
     if (calculate->zip_path[0]) {
         if (wcscpy_s(buf, bufsz - (buf - start_buf), calculate->zip_path)) {
             return INIT_ERR_BUFFER_OVERFLOW();
