@@ -1254,7 +1254,7 @@ py_dirname(const wchar_t *filename)
     dir[i] = '\0';
 
     char buffer[100];
-    PyOS_snprintf(buffer, sizeof(buffer), "%c__pypackages__%cpython%d.%d%clib", SEP, SEP, PY_MAJOR_VERSION, PY_MINOR_VERSION, SEP);
+    PyOS_snprintf(buffer, sizeof(buffer), "%c__pypackages__%c%d.%d%clib", SEP, SEP, PY_MAJOR_VERSION, PY_MINOR_VERSION, SEP);
     wchar_t *pybuffer = Py_DecodeLocale(buffer, NULL);
     if (pybuffer == NULL) {
         PyMem_RawFree(dir);
