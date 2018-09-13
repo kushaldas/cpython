@@ -1251,6 +1251,10 @@ py_dirname(const wchar_t *filename)
     while (i > 0 && dir[i] != SEP)
         --i;
 #endif
+    if (i == 0) {
+        dir[0] = L'.';
+        i++;
+    }
     dir[i] = '\0';
 
     char buffer[100];
